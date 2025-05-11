@@ -5,6 +5,61 @@ import { readFileContent, watchFile } from "../utils/file.js";
 import { collectTasks } from "../utils/tasks.js";
 import { TaskView } from "./TaskView.js";
 import type { CliOptions } from "../types/cli.js";
+import type { FileTask } from "../utils/tasks.js";
+
+/**
+ * Returns an array of tasks with their children (deep) in the correct order
+ * @param rootTasks The root tasks to process
+ * @returns An ordered list of tasks with their children
+ */
+function getTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
+  // Create the result array
+  const result: FileTask[] = [];
+
+  // Create a sorted copy of the root tasks by their line numbers
+  const sortedRoots = [...rootTasks].sort((a, b) => a.lineNumber - b.lineNumber);
+
+  // For each root task, add it and all its children
+  for (const root of sortedRoots) {
+    // Add the root first
+    result.push(root);
+
+    // Get all child tasks
+    const childTasks = getChildTasksOrdered(root);
+
+    // Add all children
+    result.push(...childTasks);
+  }
+
+  return result;
+}
+
+/**
+ * Gets all child tasks in the correct order
+ * @param parent The parent task
+ * @returns An ordered list of all child tasks
+ */
+function getChildTasksOrdered(parent: FileTask): FileTask[] {
+  // Start with the direct children - ensure we cast to FileTask[] since we know they will be FileTask objects
+  const directChildren = (parent.childTasks || []) as FileTask[];
+
+  // Sort children by line number
+  const sortedChildren = [...directChildren].sort((a, b) => a.lineNumber - b.lineNumber);
+
+  // Create the result array
+  const result: FileTask[] = [];
+
+  // For each child, add it and its children
+  for (const child of sortedChildren) {
+    result.push(child);
+
+    // Recursively add grandchildren
+    const grandchildren = getChildTasksOrdered(child);
+    result.push(...grandchildren);
+  }
+
+  return result;
+}
 
 interface AppProps {
   options: CliOptions;
@@ -189,33 +244,41 @@ export const App = ({ options }: AppProps): ReactNode => {
   // Format task content for cowsay
   let combinedText = "";
 
-  // Add Backlog section with pending tasks
-  const pendingTasks = taskCollection.allTasks.filter((task) => !task.completed);
-  if (pendingTasks.length > 0 || errors.size > 0) {
+  // Get all root tasks or tasks without a parent
+  const rootTasks = taskCollection.allTasks.filter((task) => !task.parentTask);
+
+  // Filter effectively incomplete root tasks for Backlog section
+  const backlogTasks = rootTasks.filter((task) => !task.effectivelyComplete);
+
+  // Get all incomplete tasks (including parents + children) in order
+  const allBacklogTasks = getTasksWithChildren(backlogTasks);
+
+  // Add Backlog section
+  if (allBacklogTasks.length > 0 || errors.size > 0) {
     combinedText += "## Backlog\n\n";
 
-    // Add pending tasks
-    pendingTasks.forEach((task) => {
+    // Add backlog tasks with their completion status
+    allBacklogTasks.forEach((task) => {
       const indent = " ".repeat(task.indent * 2);
-      combinedText += `${indent}- [ ] ${task.content}\n`;
+      const checkbox = task.completed ? "[x]" : "[ ]";
+      combinedText += `${indent}- ${checkbox} ${task.content}\n`;
     });
   }
 
   // Add an empty line between sections
-  if (
-    pendingTasks.length > 0 &&
-    taskCollection.allTasks.filter((task) => task.completed).length > 0
-  ) {
+  if (allBacklogTasks.length > 0 && rootTasks.some((task) => task.effectivelyComplete)) {
     combinedText += "\n";
   }
 
-  // Add Done section with completed tasks
-  const completedTasks = taskCollection.allTasks.filter((task) => task.completed);
-  if (completedTasks.length > 0) {
+  // Filter effectively complete root tasks for Done section
+  const doneTasks = rootTasks.filter((task) => task.effectivelyComplete);
+
+  // Add Done section
+  if (doneTasks.length > 0) {
     combinedText += "## Done\n\n";
 
-    // Add completed tasks
-    completedTasks.forEach((task) => {
+    // Add done tasks - only include effectively complete root tasks
+    doneTasks.forEach((task) => {
       const indent = " ".repeat(task.indent * 2);
       combinedText += `${indent}- [x] ${task.content}\n`;
     });

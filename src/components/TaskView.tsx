@@ -2,6 +2,66 @@ import React from "react";
 import { Box, Text } from "ink";
 import type { FileTask, TaskCollection } from "../utils/tasks.js";
 
+/**
+ * Gets all tasks and their children in the correct order
+ * @param rootTasks Root tasks to include
+ * @returns All tasks and their children in the correct order
+ */
+function getAllTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
+  // Sort root tasks by line number
+  const sortedRoots = [...rootTasks].sort((a, b) => a.lineNumber - b.lineNumber);
+
+  // Add all tasks recursively
+  const result: FileTask[] = [];
+
+  for (const root of sortedRoots) {
+    // Add the root task
+    result.push(root);
+
+    // Add all children recursively
+    if (root.childTasks && root.childTasks.length > 0) {
+      // Cast childTasks to FileTask[]
+      const childTasksAsFileTasks = root.childTasks as unknown as FileTask[];
+      const sortedChildren = [...childTasksAsFileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
+
+      for (const child of sortedChildren) {
+        result.push(child);
+
+        // Add grandchildren
+        const grandchildren = getDescendantsInOrder(child);
+        result.push(...grandchildren);
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Gets all descendants of a task in order
+ * @param task The parent task
+ * @returns All descendants in order
+ */
+function getDescendantsInOrder(task: FileTask): FileTask[] {
+  const result: FileTask[] = [];
+
+  if (task.childTasks && task.childTasks.length > 0) {
+    // Cast childTasks to FileTask[]
+    const childTasksAsFileTasks = task.childTasks as unknown as FileTask[];
+    const sortedChildren = [...childTasksAsFileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
+
+    for (const child of sortedChildren) {
+      result.push(child);
+
+      // Recursively add grandchildren
+      const grandchildren = getDescendantsInOrder(child);
+      result.push(...grandchildren);
+    }
+  }
+
+  return result;
+}
+
 interface TaskViewProps {
   tasks: TaskCollection;
   showDetails?: boolean;
@@ -76,9 +136,12 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
   // Get tasks grouped by files
   const { tasksByFile, allTasks } = tasks;
 
-  // Get completed and pending tasks
-  const completedTasks = allTasks.filter((task) => task.completed);
-  const pendingTasks = allTasks.filter((task) => !task.completed);
+  // Get root tasks (tasks without a parent)
+  const rootTasks = allTasks.filter((task) => !task.parentTask);
+
+  // Get effectively complete and incomplete root tasks
+  const effectivelyCompleteTasks = rootTasks.filter((task) => task.effectivelyComplete);
+  const incompleteTasks = rootTasks.filter((task) => !task.effectivelyComplete);
 
   // If there are no tasks, show a message
   if (allTasks.length === 0) {
@@ -105,8 +168,8 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
             <Text bold>## Backlog</Text>
           </Box>
           <Box marginY={1}>
-            {pendingTasks.length > 0 ? (
-              pendingTasks.map((task, index) => (
+            {incompleteTasks.length > 0 ? (
+              getAllTasksWithChildren(incompleteTasks).map((task, index) => (
                 <TaskItem key={index} task={task} showFileName={false} />
               ))
             ) : (
@@ -118,8 +181,8 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
             <Text bold>## Done</Text>
           </Box>
           <Box marginY={1}>
-            {completedTasks.length > 0 ? (
-              completedTasks.map((task, index) => (
+            {effectivelyCompleteTasks.length > 0 ? (
+              effectivelyCompleteTasks.map((task, index) => (
                 <TaskItem key={index} task={task} showFileName={false} />
               ))
             ) : (

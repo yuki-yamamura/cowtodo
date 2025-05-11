@@ -12,6 +12,14 @@ export interface TodoTask {
   lineNumber: number;
   // Indentation level (0 for top level)
   indent: number;
+  // Reference to parent task (if any)
+  parentTask?: TodoTask;
+  // Child tasks
+  childTasks: TodoTask[];
+  // Whether all child tasks are complete (if has children)
+  allChildrenComplete: boolean;
+  // Effective completion status (considering children)
+  effectivelyComplete: boolean;
 }
 
 /**
@@ -22,7 +30,7 @@ export interface TodoTask {
 export function extractTasks(markdownText: string): TodoTask[] {
   // Split the text into lines
   const lines = markdownText.split("\n");
-  const tasks: TodoTask[] = [];
+  const rawTasks: TodoTask[] = [];
 
   // Regular expression for markdown task items
   // Matches:
@@ -32,7 +40,7 @@ export function extractTasks(markdownText: string): TodoTask[] {
   // Also captures indentation
   const taskRegex = /^(\s*)[-*] \[([ xX])\] (.+)$/;
 
-  // Process each line
+  // Process each line to extract raw tasks
   lines.forEach((line, index) => {
     const match = line.match(taskRegex);
     if (match) {
@@ -42,17 +50,77 @@ export function extractTasks(markdownText: string): TodoTask[] {
       // This is an approximation - proper markdown parsers would take list structure into account
       const indent = Math.floor(indentation.length / 2);
 
-      tasks.push({
+      rawTasks.push({
         text: line.trim(),
         content: content.trim(),
         completed: checkmark.toLowerCase() === "x",
         lineNumber: index + 1, // Line numbers are 1-based
         indent,
+        childTasks: [],
+        allChildrenComplete: true, // Default true, will be updated later
+        effectivelyComplete: checkmark.toLowerCase() === "x", // Initially same as completed, will be updated
       });
     }
   });
 
-  return tasks;
+  // Build task hierarchy
+  const taskStack: TodoTask[] = [];
+  const rootTasks: TodoTask[] = [];
+
+  // Process tasks in order
+  for (const task of rawTasks) {
+    // Pop tasks from stack until we find a parent with lower indent
+    while (taskStack.length > 0 && taskStack[taskStack.length - 1].indent >= task.indent) {
+      taskStack.pop();
+    }
+
+    if (taskStack.length === 0) {
+      // This is a root task
+      rootTasks.push(task);
+    } else {
+      // This is a child task, assign to its parent
+      const parent = taskStack[taskStack.length - 1];
+      task.parentTask = parent;
+      parent.childTasks.push(task);
+    }
+
+    // Push this task onto the stack for potential children
+    taskStack.push(task);
+  }
+
+  // Calculate allChildrenComplete and effectivelyComplete for each task
+  updateCompletionStatus(rootTasks);
+
+  // Return all tasks
+  return rawTasks;
+}
+
+/**
+ * Recursively updates the completion status of tasks and their children
+ * @param tasks Array of tasks to update
+ * @returns true if all tasks are effectively complete
+ */
+function updateCompletionStatus(tasks: TodoTask[]): boolean {
+  let allComplete = true;
+
+  for (const task of tasks) {
+    // First, recursively check children
+    const childrenComplete =
+      task.childTasks.length > 0 ? updateCompletionStatus(task.childTasks) : true;
+
+    // Update child completion flag
+    task.allChildrenComplete = childrenComplete;
+
+    // A task is effectively complete if:
+    // 1. It is marked as complete itself
+    // 2. AND all its children are effectively complete
+    task.effectivelyComplete = task.completed && task.allChildrenComplete;
+
+    // Update the aggregate result
+    allComplete = allComplete && task.effectivelyComplete;
+  }
+
+  return allComplete;
 }
 
 /**
@@ -105,10 +173,14 @@ export function addContextToTasks(
   tasks: TodoTask[],
   headingContext: Map<number, string>
 ): TodoTaskWithContext[] {
-  return tasks.map((task) => ({
+  // Add context to each task
+  const result = tasks.map((task) => ({
     ...task,
     context: headingContext.get(task.lineNumber) || "",
   }));
+
+  // All other properties (parentTask, childTasks, etc.) are already part of the task object
+  return result;
 }
 
 /**
