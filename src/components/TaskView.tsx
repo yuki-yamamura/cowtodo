@@ -17,19 +17,16 @@ const TaskItem: React.FC<{ task: FileTask; showFileName?: boolean }> = ({
   // Checkbox indicator for task status
   const checkbox = task.completed ? "[x]" : "[ ]";
 
-  // Calculate total indentation (based on task's original indent + our presentation)
-  const indentSize = 2 + task.indent * 2;
-  const indent = " ".repeat(indentSize);
+  // Calculate indentation (2 spaces per level)
+  const indent = " ".repeat(task.indent * 2);
 
   return (
     <Box flexDirection="column">
       <Box>
         <Text>
-          <Text color={task.completed ? "green" : "yellow"}>{checkbox}</Text>
+          {/* Use plain text without color to match spec */}
           <Text>
-            {" "}
-            {indent}
-            {task.content}
+            {indent}- {checkbox} {task.content}
           </Text>
         </Text>
       </Box>
@@ -70,29 +67,14 @@ const TaskGroup: React.FC<{
   );
 };
 
-/**
- * Component to display task summary
- */
-const TaskSummary: React.FC<{ summary: TaskCollection["summary"] }> = ({ summary }) => {
-  const { totalFiles, totalTasks, completedTasks, completionPercentage } = summary;
-
-  return (
-    <Box flexDirection="column" marginBottom={1} borderStyle="round" paddingX={1}>
-      <Text bold>Task Summary</Text>
-      <Text>Files: {totalFiles}</Text>
-      <Text>
-        Tasks: {completedTasks}/{totalTasks} ({completionPercentage}% complete)
-      </Text>
-    </Box>
-  );
-};
+// TaskSummary component has been removed as it's no longer used
 
 /**
  * Main component to display all tasks
  */
 export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }) => {
   // Get tasks grouped by files
-  const { tasksByFile, summary, allTasks } = tasks;
+  const { tasksByFile, allTasks } = tasks;
 
   // Get completed and pending tasks
   const completedTasks = allTasks.filter((task) => task.completed);
@@ -109,8 +91,6 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
 
   return (
     <Box flexDirection="column">
-      <TaskSummary summary={summary} />
-
       {showDetails ? (
         // Detailed view: Show by file
         <Box flexDirection="column">
@@ -119,11 +99,33 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
           ))}
         </Box>
       ) : (
-        // Simple view: Just pending and completed
+        // Standard view with Backlog and Done sections
         <Box flexDirection="column">
-          <TaskGroup title="Pending Tasks" tasks={pendingTasks} showFileNames={true} />
+          <Box>
+            <Text bold>## Backlog</Text>
+          </Box>
+          <Box marginY={1}>
+            {pendingTasks.length > 0 ? (
+              pendingTasks.map((task, index) => (
+                <TaskItem key={index} task={task} showFileName={false} />
+              ))
+            ) : (
+              <Text>No pending tasks</Text>
+            )}
+          </Box>
 
-          <TaskGroup title="Completed Tasks" tasks={completedTasks} showFileNames={true} />
+          <Box marginTop={1}>
+            <Text bold>## Done</Text>
+          </Box>
+          <Box marginY={1}>
+            {completedTasks.length > 0 ? (
+              completedTasks.map((task, index) => (
+                <TaskItem key={index} task={task} showFileName={false} />
+              ))
+            ) : (
+              <Text>No completed tasks</Text>
+            )}
+          </Box>
         </Box>
       )}
     </Box>

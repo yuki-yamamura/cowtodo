@@ -12,6 +12,8 @@ const cli = meow(
     <file>  Path to a markdown file to read
 
   Options
+    --tasks    Show tasks in structured view (default: cowsay view)
+    --detailed Show task details by file (with --tasks)
     --verbose  Show verbose output
     --version  Show version
     --help     Show this help message
@@ -19,10 +21,20 @@ const cli = meow(
   Examples
     $ cowtodo README.md
     $ cowtodo docs/todo.md --verbose
+    $ cowtodo docs/todo.md --tasks
+    $ cowtodo docs/todo.md --tasks --detailed
 `,
   {
     importMeta: import.meta,
     flags: {
+      tasks: {
+        type: "boolean",
+        default: false,
+      },
+      detailed: {
+        type: "boolean",
+        default: false,
+      },
       verbose: {
         type: "boolean",
         default: false,
