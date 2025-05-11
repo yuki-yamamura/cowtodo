@@ -3,13 +3,13 @@ import { Box, Text } from "ink";
 import type { FileTask, TaskCollection } from "../utils/tasks.js";
 
 /**
- * Gets all tasks and their children in the correct order
- * @param rootTasks Root tasks to include
+ * Gets all tasks and their children in the correct order, preserving the original order of root tasks
+ * @param rootTasks Root tasks to include, already sorted in desired order
  * @returns All tasks and their children in the correct order
  */
 function getAllTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
-  // Sort root tasks by line number
-  const sortedRoots = [...rootTasks].sort((a, b) => a.lineNumber - b.lineNumber);
+  // Use the existing order of root tasks - don't sort here!
+  const sortedRoots = [...rootTasks];
 
   // Add all tasks recursively
   const result: FileTask[] = [];

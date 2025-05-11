@@ -8,16 +8,17 @@ import type { CliOptions } from "../types/cli.js";
 import type { FileTask } from "../utils/tasks.js";
 
 /**
- * Returns an array of tasks with their children (deep) in the correct order
- * @param rootTasks The root tasks to process
+ * Returns an array of tasks with their children (deep) in the correct order,
+ * preserving the original order of root tasks
+ * @param rootTasks The root tasks to process, already sorted in desired order
  * @returns An ordered list of tasks with their children
  */
 function getTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
   // Create the result array
   const result: FileTask[] = [];
 
-  // Create a sorted copy of the root tasks by their line numbers
-  const sortedRoots = [...rootTasks].sort((a, b) => a.lineNumber - b.lineNumber);
+  // Use the existing order of root tasks - don't sort here!
+  const sortedRoots = [...rootTasks];
 
   // For each root task, add it and all its children
   for (const root of sortedRoots) {
@@ -243,9 +244,7 @@ export const App = ({ options }: AppProps): ReactNode => {
   // Format task content for cowsay
   let combinedText = "";
 
-  // Debug: Log command line arguments and file order
-  console.log("CLI input order:", input);
-  console.log("Loaded file order:", taskCollection.fileOrder);
+  // Remove debug logging
 
   // Get all root tasks or tasks without a parent
   const rootTasks = taskCollection.allTasks.filter((task) => !task.parentTask);
