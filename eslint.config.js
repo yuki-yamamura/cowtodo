@@ -50,7 +50,7 @@ export default [
     rules: {
       'prettier/prettier': 'error',
       'linebreak-style': ['error', 'unix'],
-      quotes: ['error', 'double'],
+      quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
       semi: ['error', 'always'],
       'react/react-in-jsx-scope': 'off',
     },

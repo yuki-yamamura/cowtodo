@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Text } from "ink";
-import type { FileTask, TaskCollection } from "../utils/tasks.js";
+import React from 'react';
+import { Box, Text } from 'ink';
+import type { FileTask, TaskCollection } from '../utils/tasks.js';
 
 /**
  * Gets all tasks and their children in the correct order, preserving the original order of root tasks
@@ -70,15 +70,12 @@ interface TaskViewProps {
 /**
  * Component to display a single task
  */
-const TaskItem: React.FC<{ task: FileTask; showFileName?: boolean }> = ({
-  task,
-  showFileName = false,
-}) => {
+const TaskItem: React.FC<{ task: FileTask; showFileName?: boolean }> = ({ task, showFileName = false }) => {
   // Checkbox indicator for task status
-  const checkbox = task.completed ? "[x]" : "[ ]";
+  const checkbox = task.completed ? '[x]' : '[ ]';
 
   // Calculate indentation (2 spaces per level)
-  const indent = " ".repeat(task.indent * 2);
+  const indent = ' '.repeat(task.indent * 2);
 
   return (
     <Box flexDirection="column">
@@ -171,13 +168,7 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
         <Box flexDirection="column">
           {tasks.fileOrder.map((filePath, index) => {
             const fileTasks = tasksByFile.get(filePath) || [];
-            return (
-              <TaskGroup
-                key={index}
-                title={`${filePath} (${fileTasks.length})`}
-                tasks={fileTasks}
-              />
-            );
+            return <TaskGroup key={index} title={`${filePath} (${fileTasks.length})`} tasks={fileTasks} />;
           })}
         </Box>
       ) : (
@@ -201,9 +192,7 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
           </Box>
           <Box marginY={1}>
             {effectivelyCompleteTasks.length > 0 ? (
-              effectivelyCompleteTasks.map((task, index) => (
-                <TaskItem key={index} task={task} showFileName={false} />
-              ))
+              effectivelyCompleteTasks.map((task, index) => <TaskItem key={index} task={task} showFileName={false} />)
             ) : (
               <Text>No completed tasks</Text>
             )}

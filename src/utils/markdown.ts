@@ -29,7 +29,7 @@ export interface TodoTask {
  */
 export function extractTasks(markdownText: string): TodoTask[] {
   // Split the text into lines
-  const lines = markdownText.split("\n");
+  const lines = markdownText.split('\n');
   const rawTasks: TodoTask[] = [];
 
   // Regular expression for markdown task items
@@ -53,12 +53,12 @@ export function extractTasks(markdownText: string): TodoTask[] {
       rawTasks.push({
         text: line.trim(),
         content: content.trim(),
-        completed: checkmark.toLowerCase() === "x",
+        completed: checkmark.toLowerCase() === 'x',
         lineNumber: index + 1, // Line numbers are 1-based
         indent,
         childTasks: [],
         allChildrenComplete: true, // Default true, will be updated later
-        effectivelyComplete: checkmark.toLowerCase() === "x", // Initially same as completed, will be updated
+        effectivelyComplete: checkmark.toLowerCase() === 'x', // Initially same as completed, will be updated
       });
     }
   });
@@ -105,8 +105,7 @@ function updateCompletionStatus(tasks: TodoTask[]): boolean {
 
   for (const task of tasks) {
     // First, recursively check children
-    const childrenComplete =
-      task.childTasks.length > 0 ? updateCompletionStatus(task.childTasks) : true;
+    const childrenComplete = task.childTasks.length > 0 ? updateCompletionStatus(task.childTasks) : true;
 
     // Update child completion flag
     task.allChildrenComplete = childrenComplete;
@@ -129,9 +128,9 @@ function updateCompletionStatus(tasks: TodoTask[]): boolean {
  * @returns Map of line numbers to heading context
  */
 export function extractHeadingContext(markdownText: string): Map<number, string> {
-  const lines = markdownText.split("\n");
+  const lines = markdownText.split('\n');
   const headingContext = new Map<number, string>();
-  let currentHeading = "";
+  let currentHeading = '';
   let currentHeadingLevel = 0;
 
   // Regular expression for markdown headings
@@ -169,14 +168,11 @@ export interface TodoTaskWithContext extends TodoTask {
   context: string;
 }
 
-export function addContextToTasks(
-  tasks: TodoTask[],
-  headingContext: Map<number, string>
-): TodoTaskWithContext[] {
+export function addContextToTasks(tasks: TodoTask[], headingContext: Map<number, string>): TodoTaskWithContext[] {
   // Add context to each task
   const result = tasks.map((task) => ({
     ...task,
-    context: headingContext.get(task.lineNumber) || "",
+    context: headingContext.get(task.lineNumber) || '',
   }));
 
   // All other properties (parentTask, childTasks, etc.) are already part of the task object

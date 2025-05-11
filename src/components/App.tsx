@@ -1,11 +1,11 @@
-import React, { useState, useEffect, type ReactNode } from "react";
-import { Box, Text } from "ink";
-import cowsay from "cowsay";
-import { readFileContent, watchFile } from "../utils/file.js";
-import { collectTasks } from "../utils/tasks.js";
-import { TaskView } from "./TaskView.js";
-import type { CliOptions } from "../types/cli.js";
-import type { FileTask } from "../utils/tasks.js";
+import React, { useState, useEffect, type ReactNode } from 'react';
+import { Box, Text } from 'ink';
+import cowsay from 'cowsay';
+import { readFileContent, watchFile } from '../utils/file.js';
+import { collectTasks } from '../utils/tasks.js';
+import { TaskView } from './TaskView.js';
+import type { CliOptions } from '../types/cli.js';
+import type { FileTask } from '../utils/tasks.js';
 
 /**
  * Returns an array of tasks with their children (deep) in the correct order,
@@ -182,11 +182,11 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Show welcome message if no files are provided
   if (input.length === 0) {
-    const message = "Welcome to CowTodo! Please provide a file path to read.";
+    const message = 'Welcome to CowTodo! Please provide a file path to read.';
     const cowOutput = cowsay.say({
       text: message,
-      e: "^^",
-      T: "U ",
+      e: '^^',
+      T: 'U ',
     });
 
     return (
@@ -242,7 +242,7 @@ export const App = ({ options }: AppProps): ReactNode => {
   const taskCollection = collectTasks(fileContents, input);
 
   // Format task content for cowsay
-  let combinedText = "";
+  let combinedText = '';
 
   // Remove debug logging
 
@@ -269,19 +269,19 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Add Backlog section
   if (allBacklogTasks.length > 0 || errors.size > 0) {
-    combinedText += "## Backlog\n\n";
+    combinedText += '## Backlog\n\n';
 
     // Add backlog tasks with their completion status
     allBacklogTasks.forEach((task) => {
-      const indent = " ".repeat(task.indent * 2);
-      const checkbox = task.completed ? "[x]" : "[ ]";
+      const indent = ' '.repeat(task.indent * 2);
+      const checkbox = task.completed ? '[x]' : '[ ]';
       combinedText += `${indent}- ${checkbox} ${task.content}\n`;
     });
   }
 
   // Add an empty line between sections
   if (allBacklogTasks.length > 0 && rootTasks.some((task) => task.effectivelyComplete)) {
-    combinedText += "\n";
+    combinedText += '\n';
   }
 
   // Filter effectively complete root tasks for Done section
@@ -301,24 +301,24 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Add Done section
   if (doneTasks.length > 0) {
-    combinedText += "## Done\n\n";
+    combinedText += '## Done\n\n';
 
     // Add done tasks - only include effectively complete root tasks
     doneTasks.forEach((task) => {
-      const indent = " ".repeat(task.indent * 2);
+      const indent = ' '.repeat(task.indent * 2);
       combinedText += `${indent}- [x] ${task.content}\n`;
     });
   }
 
   // If no tasks found, show a message
   if (taskCollection.allTasks.length === 0) {
-    combinedText = "No tasks found in the provided files.";
+    combinedText = 'No tasks found in the provided files.';
   }
 
   // Add any errors
   if (errors.size > 0) {
-    if (combinedText) combinedText += "\n\n";
-    combinedText += "ERRORS:\n";
+    if (combinedText) combinedText += '\n\n';
+    combinedText += 'ERRORS:\n';
 
     for (const [filePath, errorMsg] of errors.entries()) {
       combinedText += `- ${filePath}: ${errorMsg}\n`;
@@ -327,8 +327,8 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Display the combined content through cowsay
   const cowOptions = {
-    text: combinedText || "No content found",
-    e: updatedFiles.size > 0 ? "OO" : "oo", // Change eyes when files are updated
+    text: combinedText || 'No content found',
+    e: updatedFiles.size > 0 ? 'OO' : 'oo', // Change eyes when files are updated
     r: false,
   };
 
@@ -338,10 +338,7 @@ export const App = ({ options }: AppProps): ReactNode => {
   const renderFileList = () => {
     return input.map((filePath, index) => (
       <Box key={index} marginRight={1}>
-        <Text
-          color={updatedFiles.has(filePath) ? "green" : "white"}
-          bold={updatedFiles.has(filePath)}
-        >
+        <Text color={updatedFiles.has(filePath) ? 'green' : 'white'} bold={updatedFiles.has(filePath)}>
           {updatedFiles.has(filePath) ? `[${filePath}]` : filePath}
         </Text>
       </Box>

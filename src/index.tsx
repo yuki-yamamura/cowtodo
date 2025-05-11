@@ -1,6 +1,6 @@
-import { render } from "ink";
-import meow from "meow";
-import { App } from "./components/App.js";
+import { render } from 'ink';
+import meow from 'meow';
+import { App } from './components/App.js';
 
 // Parse command line arguments
 const cli = meow(
@@ -28,29 +28,29 @@ const cli = meow(
     importMeta: import.meta,
     flags: {
       tasks: {
-        type: "boolean",
+        type: 'boolean',
         default: false,
       },
       detailed: {
-        type: "boolean",
+        type: 'boolean',
         default: false,
       },
       verbose: {
-        type: "boolean",
+        type: 'boolean',
         default: false,
       },
       version: {
-        type: "boolean",
+        type: 'boolean',
         default: false,
-        shortFlag: "v",
+        shortFlag: 'v',
       },
       help: {
-        type: "boolean",
+        type: 'boolean',
         default: false,
-        shortFlag: "h",
+        shortFlag: 'h',
       },
     },
-  }
+  },
 );
 
 // Render the app

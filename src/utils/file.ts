@@ -1,6 +1,6 @@
-import { readFile } from "fs/promises";
-import { existsSync, watch } from "fs";
-import path from "path";
+import { readFile } from 'fs/promises';
+import { existsSync, watch } from 'fs';
+import path from 'path';
 
 /**
  * Reads the content of a file
@@ -15,12 +15,10 @@ export async function readFileContent(filePath: string): Promise<string> {
 
   try {
     // Resolve to absolute path if it's relative
-    const absolutePath = path.isAbsolute(filePath)
-      ? filePath
-      : path.resolve(process.cwd(), filePath);
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
 
     // Read file content
-    const content = await readFile(absolutePath, "utf-8");
+    const content = await readFile(absolutePath, 'utf-8');
     return content;
   } catch (error) {
     throw new Error(`Failed to read file: ${filePath} - ${(error as Error).message}`);
@@ -45,7 +43,7 @@ export function getAbsolutePath(filePath: string): string {
 export function watchFile(
   filePath: string,
   // eslint-disable-next-line no-unused-vars
-  onChange: (eventType: string, filename: string | null) => void
+  onChange: (eventType: string, filename: string | null) => void,
 ): () => void {
   // Check if the file exists
   if (!existsSync(filePath)) {

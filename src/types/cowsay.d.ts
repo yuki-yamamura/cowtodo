@@ -1,4 +1,4 @@
-declare module "cowsay" {
+declare module 'cowsay' {
   interface CowsayOptions {
     text: string;
     e?: string;
