@@ -7,6 +7,8 @@ export interface CliOptions {
     verbose: boolean;
     version: boolean;
     help: boolean;
+    tasks?: boolean;
+    detailed?: boolean;
     [key: string]: unknown;
   };
 }
