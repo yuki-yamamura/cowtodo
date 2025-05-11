@@ -2,6 +2,8 @@ import React, { useState, useEffect, type ReactNode } from "react";
 import { Box, Text } from "ink";
 import cowsay from "cowsay";
 import { readFileContent } from "../utils/file.js";
+import { collectTasks } from "../utils/tasks.js";
+import { TaskView } from "./TaskView.js";
 import type { CliOptions } from "../types/cli.js";
 
 interface AppProps {
@@ -71,6 +73,39 @@ export const App = ({ options }: AppProps): ReactNode => {
     );
   }
 
+  // Extract and display tasks if task mode is enabled
+  if (flags.tasks) {
+    // Collect tasks from all files
+    const taskCollection = collectTasks(fileContents);
+
+    // Display tasks
+    return (
+      <Box flexDirection="column">
+        {flags.verbose && (
+          <Box marginBottom={1}>
+            <Text>Running in verbose mode</Text>
+          </Box>
+        )}
+        <TaskView tasks={taskCollection} showDetails={flags.detailed} />
+
+        {/* Show errors if any */}
+        {errors.size > 0 && (
+          <Box flexDirection="column" marginTop={1}>
+            <Text bold color="red">
+              Errors:
+            </Text>
+            {Array.from(errors.entries()).map(([filePath, errorMsg], index) => (
+              <Text key={index} color="red">
+                - {filePath}: {errorMsg}
+              </Text>
+            ))}
+          </Box>
+        )}
+      </Box>
+    );
+  }
+
+  // Default mode: Display file contents through cowsay
   // Combine all file contents
   let combinedText = "";
 
