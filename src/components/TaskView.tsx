@@ -7,7 +7,7 @@ import type { FileTask, TaskCollection } from '@/utils/tasks.js';
  * @param rootTasks Root tasks to include, already sorted in desired order
  * @returns All tasks and their children in the correct order
  */
-function getAllTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
+const getAllTasksWithChildren = (rootTasks: FileTask[]): FileTask[] => {
   // Use the existing order of root tasks - don't sort here!
   const sortedRoots = [...rootTasks];
 
@@ -35,14 +35,14 @@ function getAllTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
   }
 
   return result;
-}
+};
 
 /**
  * Gets all descendants of a task in order
  * @param task The parent task
  * @returns All descendants in order
  */
-function getDescendantsInOrder(task: FileTask): FileTask[] {
+const getDescendantsInOrder = (task: FileTask): FileTask[] => {
   const result: FileTask[] = [];
 
   if (task.childTasks && task.childTasks.length > 0) {
@@ -60,7 +60,7 @@ function getDescendantsInOrder(task: FileTask): FileTask[] {
   }
 
   return result;
-}
+};
 
 type TaskViewProps = {
   tasks: TaskCollection;

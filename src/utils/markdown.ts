@@ -27,7 +27,7 @@ export type TodoTask = {
  * @param markdownText The markdown text to parse
  * @returns Array of task items
  */
-export function extractTasks(markdownText: string): TodoTask[] {
+export const extractTasks = (markdownText: string): TodoTask[] => {
   // Split the text into lines
   const lines = markdownText.split('\n');
   const rawTasks: TodoTask[] = [];
@@ -93,14 +93,14 @@ export function extractTasks(markdownText: string): TodoTask[] {
 
   // Return all tasks
   return rawTasks;
-}
+};
 
 /**
  * Recursively updates the completion status of tasks and their children
  * @param tasks Array of tasks to update
  * @returns true if all tasks are effectively complete
  */
-function updateCompletionStatus(tasks: TodoTask[]): boolean {
+const updateCompletionStatus = (tasks: TodoTask[]): boolean => {
   let allComplete = true;
 
   for (const task of tasks) {
@@ -120,14 +120,14 @@ function updateCompletionStatus(tasks: TodoTask[]): boolean {
   }
 
   return allComplete;
-}
+};
 
 /**
  * Extracts heading context for tasks
  * @param markdownText The markdown text to parse
  * @returns Map of line numbers to heading context
  */
-export function extractHeadingContext(markdownText: string): Map<number, string> {
+export const extractHeadingContext = (markdownText: string): Map<number, string> => {
   const lines = markdownText.split('\n');
   const headingContext = new Map<number, string>();
   let currentHeading = '';
@@ -155,7 +155,7 @@ export function extractHeadingContext(markdownText: string): Map<number, string>
   });
 
   return headingContext;
-}
+};
 
 /**
  * Combines task information with heading context
@@ -168,7 +168,7 @@ export type TodoTaskWithContext = TodoTask & {
   context: string;
 };
 
-export function addContextToTasks(tasks: TodoTask[], headingContext: Map<number, string>): TodoTaskWithContext[] {
+export const addContextToTasks = (tasks: TodoTask[], headingContext: Map<number, string>): TodoTaskWithContext[] => {
   // Add context to each task
   const result = tasks.map((task) => ({
     ...task,
@@ -177,30 +177,32 @@ export function addContextToTasks(tasks: TodoTask[], headingContext: Map<number,
 
   // All other properties (parentTask, childTasks, etc.) are already part of the task object
   return result;
-}
+};
 
 /**
  * Count completed and total tasks
  * @param tasks Array of task items
  * @returns Object with counts
  */
-export function countTasks(tasks: TodoTask[]): { completed: number; total: number } {
+export const countTasks = (tasks: TodoTask[]): { completed: number; total: number } => {
   const completed = tasks.filter((task) => task.completed).length;
   return {
     completed,
     total: tasks.length,
   };
-}
+};
 
 /**
  * Process markdown text to extract tasks with context
  * @param markdownText The markdown text to parse
  * @returns Array of tasks with context and count information
  */
-export function processTasks(markdownText: string): {
+export const processTasks = (
+  markdownText: string,
+): {
   tasks: TodoTaskWithContext[];
   counts: { completed: number; total: number };
-} {
+} => {
   const tasks = extractTasks(markdownText);
   const headingContext = extractHeadingContext(markdownText);
   const tasksWithContext = addContextToTasks(tasks, headingContext);
@@ -210,4 +212,4 @@ export function processTasks(markdownText: string): {
     tasks: tasksWithContext,
     counts,
   };
-}
+};

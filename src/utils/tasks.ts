@@ -35,7 +35,7 @@ export type TaskCollection = {
  * @param fileOrder Optional array specifying the order of files to process (if not provided, will use Map keys order)
  * @returns Organized task collection
  */
-export function collectTasks(fileContents: Map<string, string>, fileOrder?: string[]): TaskCollection {
+export const collectTasks = (fileContents: Map<string, string>, fileOrder?: string[]): TaskCollection => {
   const allTasks: FileTask[] = [];
   const tasksByFile = new Map<string, FileTask[]>();
 
@@ -109,14 +109,14 @@ export function collectTasks(fileContents: Map<string, string>, fileOrder?: stri
       completionPercentage,
     },
   };
-}
+};
 
 /**
  * Group tasks by their context (heading)
  * @param tasks Array of tasks
  * @returns Map of context to tasks
  */
-export function groupTasksByContext(tasks: FileTask[]): Map<string, FileTask[]> {
+export const groupTasksByContext = (tasks: FileTask[]): Map<string, FileTask[]> => {
   const tasksByContext = new Map<string, FileTask[]>();
 
   tasks.forEach((task) => {
@@ -130,7 +130,7 @@ export function groupTasksByContext(tasks: FileTask[]): Map<string, FileTask[]> 
   });
 
   return tasksByContext;
-}
+};
 
 /**
  * Filter tasks by completion status
@@ -138,9 +138,9 @@ export function groupTasksByContext(tasks: FileTask[]): Map<string, FileTask[]> 
  * @param completed Whether to return completed tasks (true) or incomplete tasks (false)
  * @returns Filtered tasks
  */
-export function filterTasksByCompletion(tasks: FileTask[], completed: boolean): FileTask[] {
+export const filterTasksByCompletion = (tasks: FileTask[], completed: boolean): FileTask[] => {
   return tasks.filter((task) => task.completed === completed);
-}
+};
 
 /**
  * Sort tasks by different criteria
@@ -148,7 +148,7 @@ export function filterTasksByCompletion(tasks: FileTask[], completed: boolean): 
  * @param sortBy Sort criterion
  * @returns Sorted tasks
  */
-export function sortTasks(tasks: FileTask[], sortBy: 'file' | 'context' | 'completion' = 'file'): FileTask[] {
+export const sortTasks = (tasks: FileTask[], sortBy: 'file' | 'context' | 'completion' = 'file'): FileTask[] => {
   const tasksCopy = [...tasks];
 
   switch (sortBy) {
@@ -171,4 +171,4 @@ export function sortTasks(tasks: FileTask[], sortBy: 'file' | 'context' | 'compl
     default:
       return tasksCopy;
   }
-}
+};

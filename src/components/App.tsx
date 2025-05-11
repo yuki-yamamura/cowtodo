@@ -1,9 +1,9 @@
-import React, { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Box, Text } from 'ink';
 import cowsay from 'cowsay';
 import { readFileContent, watchFile } from '@/utils/file.js';
 import { collectTasks } from '@/utils/tasks.js';
-import { TaskView } from './TaskView.js';
+import { TaskView } from '@/components/TaskView.js';
 import type { CliOptions } from '@/types/cli.js';
 import type { FileTask } from '@/utils/tasks.js';
 
@@ -13,7 +13,7 @@ import type { FileTask } from '@/utils/tasks.js';
  * @param rootTasks The root tasks to process, already sorted in desired order
  * @returns An ordered list of tasks with their children
  */
-function getTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
+const getTasksWithChildren = (rootTasks: FileTask[]): FileTask[] => {
   // Create the result array
   const result: FileTask[] = [];
 
@@ -33,14 +33,14 @@ function getTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
   }
 
   return result;
-}
+};
 
 /**
  * Gets all child tasks in the correct order
  * @param parent The parent task
  * @returns An ordered list of all child tasks
  */
-function getChildTasksOrdered(parent: FileTask): FileTask[] {
+const getChildTasksOrdered = (parent: FileTask): FileTask[] => {
   // Start with the direct children - ensure we cast to FileTask[] since we know they will be FileTask objects
   const directChildren = (parent.childTasks || []) as FileTask[];
 
@@ -60,7 +60,7 @@ function getChildTasksOrdered(parent: FileTask): FileTask[] {
   }
 
   return result;
-}
+};
 
 type AppProps = {
   options: CliOptions;
