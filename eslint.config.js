@@ -6,7 +6,7 @@ import prettierPlugin from "eslint-plugin-prettier";
 
 export default [
   {
-    ignores: ["node_modules/**", "dist/**", ".vscode/**"]
+    ignores: ["node_modules/**", "dist/**", ".vscode/**"],
   },
   js.configs.recommended,
   {
@@ -27,8 +27,8 @@ export default [
         exports: "readonly",
         __dirname: "readonly",
         __filename: "readonly",
-        process: "readonly"
-      }
+        process: "readonly",
+      },
     },
     plugins: {
       "@typescript-eslint": tsPlugin,
