@@ -10,8 +10,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "build": "tsc",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc && npm run build:post",
+    "build:post": "sed -i '' 's|@/components/app.js|./components/app.js|g' dist/index.js && sed -i '' 's|@/utils|../utils|g' dist/components/*.js && sed -i '' 's|@/components|../components|g' dist/components/*.js && sed -i '' 's|@/types|../types|g' dist/components/*.js",
     "dev": "tsx watch src/index.tsx",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,md}\"",
@@ -54,6 +56,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
     "prettier": "^3.5.3",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.4"
   },
   "lint-staged": {

@@ -1,13 +1,13 @@
-import { readFile } from "fs/promises";
-import { existsSync, watch } from "fs";
-import path from "path";
+import { readFile } from 'fs/promises';
+import { existsSync, watch } from 'fs';
+import path from 'path';
 
 /**
  * Reads the content of a file
  * @param filePath Path to the file
  * @returns File content as string
  */
-export async function readFileContent(filePath: string): Promise<string> {
+export const readFileContent = async (filePath: string): Promise<string> => {
   // Check if the file exists
   if (!existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
@@ -15,26 +15,24 @@ export async function readFileContent(filePath: string): Promise<string> {
 
   try {
     // Resolve to absolute path if it's relative
-    const absolutePath = path.isAbsolute(filePath)
-      ? filePath
-      : path.resolve(process.cwd(), filePath);
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
 
     // Read file content
-    const content = await readFile(absolutePath, "utf-8");
+    const content = await readFile(absolutePath, 'utf-8');
     return content;
   } catch (error) {
     throw new Error(`Failed to read file: ${filePath} - ${(error as Error).message}`);
   }
-}
+};
 
 /**
  * Returns the absolute path for a file
  * @param filePath Path to the file
  * @returns Absolute path
  */
-export function getAbsolutePath(filePath: string): string {
+export const getAbsolutePath = (filePath: string): string => {
   return path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
-}
+};
 
 /**
  * Watch a file for changes
@@ -42,11 +40,11 @@ export function getAbsolutePath(filePath: string): string {
  * @param onChange Callback function called when file changes
  * @returns Function to stop watching
  */
-export function watchFile(
+export const watchFile = (
   filePath: string,
   // eslint-disable-next-line no-unused-vars
-  onChange: (eventType: string, filename: string | null) => void
-): () => void {
+  onChange: (eventType: string, filename: string | null) => void,
+): (() => void) => {
   // Check if the file exists
   if (!existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
@@ -72,4 +70,4 @@ export function watchFile(
   return () => {
     watcher.close();
   };
-}
+};

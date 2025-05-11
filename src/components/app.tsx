@@ -1,70 +1,15 @@
-import React, { useState, useEffect, type ReactNode } from "react";
-import { Box, Text } from "ink";
-import cowsay from "cowsay";
-import { readFileContent, watchFile } from "../utils/file.js";
-import { collectTasks } from "../utils/tasks.js";
-import { TaskView } from "./TaskView.js";
-import type { CliOptions } from "../types/cli.js";
-import type { FileTask } from "../utils/tasks.js";
+import { useState, useEffect, type ReactNode } from 'react';
+import { Box, Text } from 'ink';
+import cowsay from 'cowsay';
+import { readFileContent, watchFile } from '@/utils/file.js';
+import { collectTasks } from '@/utils/tasks.js';
+import { getTasksWithChildren } from '@/utils/task-hierarchy.js';
+import { TaskView } from '@/components/task-view.js';
+import type { CliOptions } from '@/types/cli.js';
 
-/**
- * Returns an array of tasks with their children (deep) in the correct order,
- * preserving the original order of root tasks
- * @param rootTasks The root tasks to process, already sorted in desired order
- * @returns An ordered list of tasks with their children
- */
-function getTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
-  // Create the result array
-  const result: FileTask[] = [];
-
-  // Use the existing order of root tasks - don't sort here!
-  const sortedRoots = [...rootTasks];
-
-  // For each root task, add it and all its children
-  for (const root of sortedRoots) {
-    // Add the root first
-    result.push(root);
-
-    // Get all child tasks
-    const childTasks = getChildTasksOrdered(root);
-
-    // Add all children
-    result.push(...childTasks);
-  }
-
-  return result;
-}
-
-/**
- * Gets all child tasks in the correct order
- * @param parent The parent task
- * @returns An ordered list of all child tasks
- */
-function getChildTasksOrdered(parent: FileTask): FileTask[] {
-  // Start with the direct children - ensure we cast to FileTask[] since we know they will be FileTask objects
-  const directChildren = (parent.childTasks || []) as FileTask[];
-
-  // Sort children by line number
-  const sortedChildren = [...directChildren].sort((a, b) => a.lineNumber - b.lineNumber);
-
-  // Create the result array
-  const result: FileTask[] = [];
-
-  // For each child, add it and its children
-  for (const child of sortedChildren) {
-    result.push(child);
-
-    // Recursively add grandchildren
-    const grandchildren = getChildTasksOrdered(child);
-    result.push(...grandchildren);
-  }
-
-  return result;
-}
-
-interface AppProps {
+type AppProps = {
   options: CliOptions;
-}
+};
 
 export const App = ({ options }: AppProps): ReactNode => {
   const { input, flags } = options;
@@ -182,11 +127,11 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Show welcome message if no files are provided
   if (input.length === 0) {
-    const message = "Welcome to CowTodo! Please provide a file path to read.";
+    const message = 'Welcome to CowTodo! Please provide a file path to read.';
     const cowOutput = cowsay.say({
       text: message,
-      e: "^^",
-      T: "U ",
+      e: '^^',
+      T: 'U ',
     });
 
     return (
@@ -242,7 +187,7 @@ export const App = ({ options }: AppProps): ReactNode => {
   const taskCollection = collectTasks(fileContents, input);
 
   // Format task content for cowsay
-  let combinedText = "";
+  let combinedText = '';
 
   // Remove debug logging
 
@@ -269,19 +214,19 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Add Backlog section
   if (allBacklogTasks.length > 0 || errors.size > 0) {
-    combinedText += "## Backlog\n\n";
+    combinedText += '## Backlog\n\n';
 
     // Add backlog tasks with their completion status
     allBacklogTasks.forEach((task) => {
-      const indent = " ".repeat(task.indent * 2);
-      const checkbox = task.completed ? "[x]" : "[ ]";
+      const indent = ' '.repeat(task.indent * 2);
+      const checkbox = task.completed ? '[x]' : '[ ]';
       combinedText += `${indent}- ${checkbox} ${task.content}\n`;
     });
   }
 
   // Add an empty line between sections
   if (allBacklogTasks.length > 0 && rootTasks.some((task) => task.effectivelyComplete)) {
-    combinedText += "\n";
+    combinedText += '\n';
   }
 
   // Filter effectively complete root tasks for Done section
@@ -301,24 +246,24 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Add Done section
   if (doneTasks.length > 0) {
-    combinedText += "## Done\n\n";
+    combinedText += '## Done\n\n';
 
     // Add done tasks - only include effectively complete root tasks
     doneTasks.forEach((task) => {
-      const indent = " ".repeat(task.indent * 2);
+      const indent = ' '.repeat(task.indent * 2);
       combinedText += `${indent}- [x] ${task.content}\n`;
     });
   }
 
   // If no tasks found, show a message
   if (taskCollection.allTasks.length === 0) {
-    combinedText = "No tasks found in the provided files.";
+    combinedText = 'No tasks found in the provided files.';
   }
 
   // Add any errors
   if (errors.size > 0) {
-    if (combinedText) combinedText += "\n\n";
-    combinedText += "ERRORS:\n";
+    if (combinedText) combinedText += '\n\n';
+    combinedText += 'ERRORS:\n';
 
     for (const [filePath, errorMsg] of errors.entries()) {
       combinedText += `- ${filePath}: ${errorMsg}\n`;
@@ -327,8 +272,8 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Display the combined content through cowsay
   const cowOptions = {
-    text: combinedText || "No content found",
-    e: updatedFiles.size > 0 ? "OO" : "oo", // Change eyes when files are updated
+    text: combinedText || 'No content found',
+    e: updatedFiles.size > 0 ? 'OO' : 'oo', // Change eyes when files are updated
     r: false,
   };
 
@@ -338,10 +283,7 @@ export const App = ({ options }: AppProps): ReactNode => {
   const renderFileList = () => {
     return input.map((filePath, index) => (
       <Box key={index} marginRight={1}>
-        <Text
-          color={updatedFiles.has(filePath) ? "green" : "white"}
-          bold={updatedFiles.has(filePath)}
-        >
+        <Text color={updatedFiles.has(filePath) ? 'green' : 'white'} bold={updatedFiles.has(filePath)}>
           {updatedFiles.has(filePath) ? `[${filePath}]` : filePath}
         </Text>
       </Box>

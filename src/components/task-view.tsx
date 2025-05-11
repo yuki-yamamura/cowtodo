@@ -1,84 +1,22 @@
-import React from "react";
-import { Box, Text } from "ink";
-import type { FileTask, TaskCollection } from "../utils/tasks.js";
+import React from 'react';
+import { Box, Text } from 'ink';
+import type { FileTask, TaskCollection } from '@/utils/tasks.js';
+import { getTasksWithChildren } from '@/utils/task-hierarchy.js';
 
-/**
- * Gets all tasks and their children in the correct order, preserving the original order of root tasks
- * @param rootTasks Root tasks to include, already sorted in desired order
- * @returns All tasks and their children in the correct order
- */
-function getAllTasksWithChildren(rootTasks: FileTask[]): FileTask[] {
-  // Use the existing order of root tasks - don't sort here!
-  const sortedRoots = [...rootTasks];
-
-  // Add all tasks recursively
-  const result: FileTask[] = [];
-
-  for (const root of sortedRoots) {
-    // Add the root task
-    result.push(root);
-
-    // Add all children recursively
-    if (root.childTasks && root.childTasks.length > 0) {
-      // Cast childTasks to FileTask[]
-      const childTasksAsFileTasks = root.childTasks as unknown as FileTask[];
-      const sortedChildren = [...childTasksAsFileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
-
-      for (const child of sortedChildren) {
-        result.push(child);
-
-        // Add grandchildren
-        const grandchildren = getDescendantsInOrder(child);
-        result.push(...grandchildren);
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Gets all descendants of a task in order
- * @param task The parent task
- * @returns All descendants in order
- */
-function getDescendantsInOrder(task: FileTask): FileTask[] {
-  const result: FileTask[] = [];
-
-  if (task.childTasks && task.childTasks.length > 0) {
-    // Cast childTasks to FileTask[]
-    const childTasksAsFileTasks = task.childTasks as unknown as FileTask[];
-    const sortedChildren = [...childTasksAsFileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
-
-    for (const child of sortedChildren) {
-      result.push(child);
-
-      // Recursively add grandchildren
-      const grandchildren = getDescendantsInOrder(child);
-      result.push(...grandchildren);
-    }
-  }
-
-  return result;
-}
-
-interface TaskViewProps {
+type TaskViewProps = {
   tasks: TaskCollection;
   showDetails?: boolean;
-}
+};
 
 /**
  * Component to display a single task
  */
-const TaskItem: React.FC<{ task: FileTask; showFileName?: boolean }> = ({
-  task,
-  showFileName = false,
-}) => {
+const TaskItem: React.FC<{ task: FileTask; showFileName?: boolean }> = ({ task, showFileName = false }) => {
   // Checkbox indicator for task status
-  const checkbox = task.completed ? "[x]" : "[ ]";
+  const checkbox = task.completed ? '[x]' : '[ ]';
 
   // Calculate indentation (2 spaces per level)
-  const indent = " ".repeat(task.indent * 2);
+  const indent = ' '.repeat(task.indent * 2);
 
   return (
     <Box flexDirection="column">
@@ -171,13 +109,7 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
         <Box flexDirection="column">
           {tasks.fileOrder.map((filePath, index) => {
             const fileTasks = tasksByFile.get(filePath) || [];
-            return (
-              <TaskGroup
-                key={index}
-                title={`${filePath} (${fileTasks.length})`}
-                tasks={fileTasks}
-              />
-            );
+            return <TaskGroup key={index} title={`${filePath} (${fileTasks.length})`} tasks={fileTasks} />;
           })}
         </Box>
       ) : (
@@ -188,7 +120,7 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
           </Box>
           <Box marginY={1}>
             {incompleteTasks.length > 0 ? (
-              getAllTasksWithChildren(incompleteTasks).map((task, index) => (
+              getTasksWithChildren(incompleteTasks).map((task, index) => (
                 <TaskItem key={index} task={task} showFileName={false} />
               ))
             ) : (
@@ -201,9 +133,7 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
           </Box>
           <Box marginY={1}>
             {effectivelyCompleteTasks.length > 0 ? (
-              effectivelyCompleteTasks.map((task, index) => (
-                <TaskItem key={index} task={task} showFileName={false} />
-              ))
+              effectivelyCompleteTasks.map((task, index) => <TaskItem key={index} task={task} showFileName={false} />)
             ) : (
               <Text>No completed tasks</Text>
             )}

@@ -1,7 +1,7 @@
 /**
  * Represents a task item in markdown
  */
-export interface TodoTask {
+export type TodoTask = {
   // The full text of the task
   text: string;
   // The raw content of the task (excluding checkbox)
@@ -20,16 +20,16 @@ export interface TodoTask {
   allChildrenComplete: boolean;
   // Effective completion status (considering children)
   effectivelyComplete: boolean;
-}
+};
 
 /**
  * Extracts task items from markdown text
  * @param markdownText The markdown text to parse
  * @returns Array of task items
  */
-export function extractTasks(markdownText: string): TodoTask[] {
+export const extractTasks = (markdownText: string): TodoTask[] => {
   // Split the text into lines
-  const lines = markdownText.split("\n");
+  const lines = markdownText.split('\n');
   const rawTasks: TodoTask[] = [];
 
   // Regular expression for markdown task items
@@ -53,12 +53,12 @@ export function extractTasks(markdownText: string): TodoTask[] {
       rawTasks.push({
         text: line.trim(),
         content: content.trim(),
-        completed: checkmark.toLowerCase() === "x",
+        completed: checkmark.toLowerCase() === 'x',
         lineNumber: index + 1, // Line numbers are 1-based
         indent,
         childTasks: [],
         allChildrenComplete: true, // Default true, will be updated later
-        effectivelyComplete: checkmark.toLowerCase() === "x", // Initially same as completed, will be updated
+        effectivelyComplete: checkmark.toLowerCase() === 'x', // Initially same as completed, will be updated
       });
     }
   });
@@ -93,20 +93,19 @@ export function extractTasks(markdownText: string): TodoTask[] {
 
   // Return all tasks
   return rawTasks;
-}
+};
 
 /**
  * Recursively updates the completion status of tasks and their children
  * @param tasks Array of tasks to update
  * @returns true if all tasks are effectively complete
  */
-function updateCompletionStatus(tasks: TodoTask[]): boolean {
+const updateCompletionStatus = (tasks: TodoTask[]): boolean => {
   let allComplete = true;
 
   for (const task of tasks) {
     // First, recursively check children
-    const childrenComplete =
-      task.childTasks.length > 0 ? updateCompletionStatus(task.childTasks) : true;
+    const childrenComplete = task.childTasks.length > 0 ? updateCompletionStatus(task.childTasks) : true;
 
     // Update child completion flag
     task.allChildrenComplete = childrenComplete;
@@ -121,17 +120,17 @@ function updateCompletionStatus(tasks: TodoTask[]): boolean {
   }
 
   return allComplete;
-}
+};
 
 /**
  * Extracts heading context for tasks
  * @param markdownText The markdown text to parse
  * @returns Map of line numbers to heading context
  */
-export function extractHeadingContext(markdownText: string): Map<number, string> {
-  const lines = markdownText.split("\n");
+export const extractHeadingContext = (markdownText: string): Map<number, string> => {
+  const lines = markdownText.split('\n');
   const headingContext = new Map<number, string>();
-  let currentHeading = "";
+  let currentHeading = '';
   let currentHeadingLevel = 0;
 
   // Regular expression for markdown headings
@@ -156,7 +155,7 @@ export function extractHeadingContext(markdownText: string): Map<number, string>
   });
 
   return headingContext;
-}
+};
 
 /**
  * Combines task information with heading context
@@ -164,47 +163,46 @@ export function extractHeadingContext(markdownText: string): Map<number, string>
  * @param headingContext Map of line numbers to heading context
  * @returns Array of tasks with context
  */
-export interface TodoTaskWithContext extends TodoTask {
+export type TodoTaskWithContext = TodoTask & {
   // Heading context for the task
   context: string;
-}
+};
 
-export function addContextToTasks(
-  tasks: TodoTask[],
-  headingContext: Map<number, string>
-): TodoTaskWithContext[] {
+export const addContextToTasks = (tasks: TodoTask[], headingContext: Map<number, string>): TodoTaskWithContext[] => {
   // Add context to each task
   const result = tasks.map((task) => ({
     ...task,
-    context: headingContext.get(task.lineNumber) || "",
+    context: headingContext.get(task.lineNumber) || '',
   }));
 
   // All other properties (parentTask, childTasks, etc.) are already part of the task object
   return result;
-}
+};
 
 /**
  * Count completed and total tasks
  * @param tasks Array of task items
  * @returns Object with counts
  */
-export function countTasks(tasks: TodoTask[]): { completed: number; total: number } {
+export const countTasks = (tasks: TodoTask[]): { completed: number; total: number } => {
   const completed = tasks.filter((task) => task.completed).length;
   return {
     completed,
     total: tasks.length,
   };
-}
+};
 
 /**
  * Process markdown text to extract tasks with context
  * @param markdownText The markdown text to parse
  * @returns Array of tasks with context and count information
  */
-export function processTasks(markdownText: string): {
+export const processTasks = (
+  markdownText: string,
+): {
   tasks: TodoTaskWithContext[];
   counts: { completed: number; total: number };
-} {
+} => {
   const tasks = extractTasks(markdownText);
   const headingContext = extractHeadingContext(markdownText);
   const tasksWithContext = addContextToTasks(tasks, headingContext);
@@ -214,4 +212,4 @@ export function processTasks(markdownText: string): {
     tasks: tasksWithContext,
     counts,
   };
-}
+};
