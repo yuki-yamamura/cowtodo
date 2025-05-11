@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Text } from 'ink';
-import type { FileTask, TaskCollection } from '../utils/tasks.js';
+import type { FileTask, TaskCollection } from '@/utils/tasks.js';
 
 /**
  * Gets all tasks and their children in the correct order, preserving the original order of root tasks

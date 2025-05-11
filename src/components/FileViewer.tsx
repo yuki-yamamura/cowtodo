@@ -1,7 +1,7 @@
 import React, { useState, useEffect, type ReactNode } from 'react';
 import { Box, Text } from 'ink';
 import cowsay from 'cowsay';
-import { readFileContent } from '../utils/file.js';
+import { readFileContent } from '@/utils/file.js';
 
 type FileViewerProps = {
   filePath: string;

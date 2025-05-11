@@ -1,11 +1,11 @@
 import React, { useState, useEffect, type ReactNode } from 'react';
 import { Box, Text } from 'ink';
 import cowsay from 'cowsay';
-import { readFileContent, watchFile } from '../utils/file.js';
-import { collectTasks } from '../utils/tasks.js';
+import { readFileContent, watchFile } from '@/utils/file.js';
+import { collectTasks } from '@/utils/tasks.js';
 import { TaskView } from './TaskView.js';
-import type { CliOptions } from '../types/cli.js';
-import type { FileTask } from '../utils/tasks.js';
+import type { CliOptions } from '@/types/cli.js';
+import type { FileTask } from '@/utils/tasks.js';
 
 /**
  * Returns an array of tasks with their children (deep) in the correct order,
