@@ -14,7 +14,11 @@ export const App = ({ options }: AppProps): ReactNode => {
   // Show welcome message if no files are provided
   if (input.length === 0) {
     const message = "Welcome to CowTodo! Please provide a file path to read.";
-    const cowOutput = cowsay.say({ text: message });
+    const cowOutput = cowsay.say({
+      text: message,
+      e: "^^",
+      T: "U ",
+    });
 
     return (
       <Box flexDirection="column">
@@ -33,7 +37,7 @@ export const App = ({ options }: AppProps): ReactNode => {
 
       {input.map((filePath, index) => (
         <Box key={index} flexDirection="column" marginBottom={1}>
-          <FileViewer filePath={filePath} />
+          <FileViewer filePath={filePath} verbose={flags.verbose} />
         </Box>
       ))}
     </Box>

@@ -1,12 +1,14 @@
 import React, { useState, useEffect, type ReactNode } from "react";
 import { Box, Text } from "ink";
+import cowsay from "cowsay";
 import { readFileContent } from "../utils/file.js";
 
 interface FileViewerProps {
   filePath: string;
+  verbose?: boolean;
 }
 
-export const FileViewer = ({ filePath }: FileViewerProps): ReactNode => {
+export const FileViewer = ({ filePath, verbose = false }: FileViewerProps): ReactNode => {
   const [content, setContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,20 +41,37 @@ export const FileViewer = ({ filePath }: FileViewerProps): ReactNode => {
   }
 
   if (error) {
+    const errorMessage = cowsay.say({
+      text: `Error: ${error}`,
+      e: "xx",
+      T: "U ",
+    });
+
     return (
       <Box>
-        <Text color="red">Error: {error}</Text>
+        <Text color="red">{errorMessage}</Text>
       </Box>
     );
   }
 
+  // Show file content through cowsay
+  const cowOptions = {
+    text: verbose ? `File: ${filePath}\n\n${content}` : content || "",
+    e: "oo",
+    r: false,
+  };
+
+  const cowOutput = cowsay.say(cowOptions);
+
   return (
     <Box flexDirection="column">
-      <Box marginBottom={1}>
-        <Text bold>File: {filePath}</Text>
-      </Box>
+      {verbose && (
+        <Box marginBottom={1}>
+          <Text bold>File: {filePath}</Text>
+        </Box>
+      )}
       <Box>
-        <Text>{content}</Text>
+        <Text>{cowOutput}</Text>
       </Box>
     </Box>
   );
