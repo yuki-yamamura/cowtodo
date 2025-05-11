@@ -206,8 +206,8 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Extract and display tasks if task mode is enabled
   if (flags.tasks) {
-    // Collect tasks from all files
-    const taskCollection = collectTasks(fileContents);
+    // Collect tasks from all files - pass input array to preserve CLI order
+    const taskCollection = collectTasks(fileContents, input);
 
     // Display tasks
     return (
@@ -237,14 +237,15 @@ export const App = ({ options }: AppProps): ReactNode => {
   }
 
   // Default mode: Extract tasks and display through cowsay
-  // Collect tasks from all files
-  const taskCollection = collectTasks(fileContents);
+  // Collect tasks from all files - pass input array to preserve CLI order
+  const taskCollection = collectTasks(fileContents, input);
 
   // Format task content for cowsay
   let combinedText = "";
 
-  // Debug: Log file order
-  console.log("File order:", taskCollection.fileOrder);
+  // Debug: Log command line arguments and file order
+  console.log("CLI input order:", input);
+  console.log("Loaded file order:", taskCollection.fileOrder);
 
   // Get all root tasks or tasks without a parent
   const rootTasks = taskCollection.allTasks.filter((task) => !task.parentTask);
