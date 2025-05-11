@@ -1,6 +1,6 @@
 import { render } from 'ink';
 import meow from 'meow';
-import { App } from '@/components/App.js';
+import { App } from '@/components/app.js';
 
 // Parse command line arguments
 const cli = meow(

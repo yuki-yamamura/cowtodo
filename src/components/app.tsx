@@ -3,7 +3,7 @@ import { Box, Text } from 'ink';
 import cowsay from 'cowsay';
 import { readFileContent, watchFile } from '@/utils/file.js';
 import { collectTasks } from '@/utils/tasks.js';
-import { TaskView } from '@/components/TaskView.js';
+import { TaskView } from '@/components/task-view.js';
 import type { CliOptions } from '@/types/cli.js';
 import type { FileTask } from '@/utils/tasks.js';
 
