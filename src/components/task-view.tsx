@@ -1,66 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import type { FileTask, TaskCollection } from '@/utils/tasks.js';
-
-/**
- * Gets all tasks and their children in the correct order, preserving the original order of root tasks
- * @param rootTasks Root tasks to include, already sorted in desired order
- * @returns All tasks and their children in the correct order
- */
-const getAllTasksWithChildren = (rootTasks: FileTask[]): FileTask[] => {
-  // Use the existing order of root tasks - don't sort here!
-  const sortedRoots = [...rootTasks];
-
-  // Add all tasks recursively
-  const result: FileTask[] = [];
-
-  for (const root of sortedRoots) {
-    // Add the root task
-    result.push(root);
-
-    // Add all children recursively
-    if (root.childTasks && root.childTasks.length > 0) {
-      // Cast childTasks to FileTask[]
-      const childTasksAsFileTasks = root.childTasks as unknown as FileTask[];
-      const sortedChildren = [...childTasksAsFileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
-
-      for (const child of sortedChildren) {
-        result.push(child);
-
-        // Add grandchildren
-        const grandchildren = getDescendantsInOrder(child);
-        result.push(...grandchildren);
-      }
-    }
-  }
-
-  return result;
-};
-
-/**
- * Gets all descendants of a task in order
- * @param task The parent task
- * @returns All descendants in order
- */
-const getDescendantsInOrder = (task: FileTask): FileTask[] => {
-  const result: FileTask[] = [];
-
-  if (task.childTasks && task.childTasks.length > 0) {
-    // Cast childTasks to FileTask[]
-    const childTasksAsFileTasks = task.childTasks as unknown as FileTask[];
-    const sortedChildren = [...childTasksAsFileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
-
-    for (const child of sortedChildren) {
-      result.push(child);
-
-      // Recursively add grandchildren
-      const grandchildren = getDescendantsInOrder(child);
-      result.push(...grandchildren);
-    }
-  }
-
-  return result;
-};
+import { getTasksWithChildren } from '@/utils/task-hierarchy.js';
 
 type TaskViewProps = {
   tasks: TaskCollection;
@@ -179,7 +120,7 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
           </Box>
           <Box marginY={1}>
             {incompleteTasks.length > 0 ? (
-              getAllTasksWithChildren(incompleteTasks).map((task, index) => (
+              getTasksWithChildren(incompleteTasks).map((task, index) => (
                 <TaskItem key={index} task={task} showFileName={false} />
               ))
             ) : (
