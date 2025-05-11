@@ -43,6 +43,7 @@ The project is just starting out. As development tools, dependencies, and build 
 #### Parent Task
 
 親タスクの PR が作成されていない場合、以下の手順に従う:
+
 1. 親タスクの状態を「着手中」に変更
 2. Git で main からブランチを作成 (ブランチ名は`story/<タスクID>`とする)
 3. 空コミットを作成 (コミットメッセージは`chore: start story/<タスクID>`とする)
@@ -53,6 +54,7 @@ The project is just starting out. As development tools, dependencies, and build 
 #### Sub-Task
 
 サブタスク開始時の手順:
+
 1. サブタスクの状態を「着手中」に変更
 2. タスクの開始日時を設定 (時間まで記載すること)
 3. Git で親タスクからブランチを作成 (ブランチ名は`feature/<タスクID>`とする)
@@ -65,17 +67,20 @@ The project is just starting out. As development tools, dependencies, and build 
 #### Task Completion
 
 サブタスク完了時の手順:
-1. PR をマージ (`gh pr merge --merge --auto --delete-branch`)
-2. タスクの開始日時を設定 (時間まで記載すること)
-3. タスクに「サマリー」を追加
+
+1. PR のステータスを ready にする
+2. PR をマージ (`gh pr merge --merge --auto --delete-branch`)
+3. タスクの開始日時を設定 (時間まで記載すること)
+4. タスクに「サマリー」を追加
    - コマンドライン履歴とコンテキストを参照して、振り返りを効率化するための文章を作成
    - Notion の見出しは「振り返り」とする
-4. タスクの状態を「完了」に変更
-5. タスクの完了日時を記載 (時間まで記載すること)
+5. タスクの状態を「完了」に変更
+6. タスクの完了日時を記載 (時間まで記載すること)
 
 ## Code Review
 
-ユーザーからPRのレビュー依頼があった場合、以下の観点でコードのレビューを行う:
+ユーザーから PR のレビュー依頼があった場合、以下の観点でコードのレビューを行う:
+
 - 仕様をすべて満たしているか確認
 - タスクにチェックリストがある場合、すべてにチェックが入っているか確認
 - タイポがないか確認
