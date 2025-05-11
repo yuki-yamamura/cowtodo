@@ -139,6 +139,18 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
   // Get root tasks (tasks without a parent)
   const rootTasks = allTasks.filter((task) => !task.parentTask);
 
+  // Sort root tasks by file order from CLI arguments
+  rootTasks.sort((a, b) => {
+    // First sort by file path using the original file order
+    if (a.filePath !== b.filePath) {
+      const aIndex = tasks.fileOrder.indexOf(a.filePath);
+      const bIndex = tasks.fileOrder.indexOf(b.filePath);
+      return aIndex - bIndex;
+    }
+    // Then sort by line number within the same file
+    return a.lineNumber - b.lineNumber;
+  });
+
   // Get effectively complete and incomplete root tasks
   const effectivelyCompleteTasks = rootTasks.filter((task) => task.effectivelyComplete);
   const incompleteTasks = rootTasks.filter((task) => !task.effectivelyComplete);
@@ -155,11 +167,18 @@ export const TaskView: React.FC<TaskViewProps> = ({ tasks, showDetails = false }
   return (
     <Box flexDirection="column">
       {showDetails ? (
-        // Detailed view: Show by file
+        // Detailed view: Show by file, in original CLI order
         <Box flexDirection="column">
-          {Array.from(tasksByFile.entries()).map(([filePath, fileTasks], index) => (
-            <TaskGroup key={index} title={`${filePath} (${fileTasks.length})`} tasks={fileTasks} />
-          ))}
+          {tasks.fileOrder.map((filePath, index) => {
+            const fileTasks = tasksByFile.get(filePath) || [];
+            return (
+              <TaskGroup
+                key={index}
+                title={`${filePath} (${fileTasks.length})`}
+                tasks={fileTasks}
+              />
+            );
+          })}
         </Box>
       ) : (
         // Standard view with Backlog and Done sections

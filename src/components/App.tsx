@@ -81,20 +81,19 @@ export const App = ({ options }: AppProps): ReactNode => {
     }
 
     setLoading(true);
+    // Use OrderedMap to maintain input file order
     const newFileContents = new Map<string, string>();
     const newErrors = new Map<string, string>();
 
-    // Load all files in parallel
-    await Promise.all(
-      input.map(async (filePath) => {
-        try {
-          const content = await readFileContent(filePath);
-          newFileContents.set(filePath, content);
-        } catch (err) {
-          newErrors.set(filePath, (err as Error).message);
-        }
-      })
-    );
+    // Load all files in sequence to maintain order
+    for (const filePath of input) {
+      try {
+        const content = await readFileContent(filePath);
+        newFileContents.set(filePath, content);
+      } catch (err) {
+        newErrors.set(filePath, (err as Error).message);
+      }
+    }
 
     setFileContents(newFileContents);
     setErrors(newErrors);
@@ -244,8 +243,23 @@ export const App = ({ options }: AppProps): ReactNode => {
   // Format task content for cowsay
   let combinedText = "";
 
+  // Debug: Log file order
+  console.log("File order:", taskCollection.fileOrder);
+
   // Get all root tasks or tasks without a parent
   const rootTasks = taskCollection.allTasks.filter((task) => !task.parentTask);
+
+  // Sort root tasks by file order from CLI arguments
+  rootTasks.sort((a, b) => {
+    // First sort by file path using the original file order
+    if (a.filePath !== b.filePath) {
+      const aIndex = taskCollection.fileOrder.indexOf(a.filePath);
+      const bIndex = taskCollection.fileOrder.indexOf(b.filePath);
+      return aIndex - bIndex;
+    }
+    // Then sort by line number within the same file
+    return a.lineNumber - b.lineNumber;
+  });
 
   // Filter effectively incomplete root tasks for Backlog section
   const backlogTasks = rootTasks.filter((task) => !task.effectivelyComplete);
@@ -272,6 +286,18 @@ export const App = ({ options }: AppProps): ReactNode => {
 
   // Filter effectively complete root tasks for Done section
   const doneTasks = rootTasks.filter((task) => task.effectivelyComplete);
+
+  // Sort done tasks by the same ordering as backlog tasks - first by file order, then by line number
+  doneTasks.sort((a, b) => {
+    // First sort by file path using the original file order
+    if (a.filePath !== b.filePath) {
+      const aIndex = taskCollection.fileOrder.indexOf(a.filePath);
+      const bIndex = taskCollection.fileOrder.indexOf(b.filePath);
+      return aIndex - bIndex;
+    }
+    // Then sort by line number within the same file
+    return a.lineNumber - b.lineNumber;
+  });
 
   // Add Done section
   if (doneTasks.length > 0) {

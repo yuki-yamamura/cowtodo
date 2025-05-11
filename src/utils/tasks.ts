@@ -18,6 +18,8 @@ export interface TaskCollection {
   allTasks: FileTask[];
   // Tasks grouped by file
   tasksByFile: Map<string, FileTask[]>;
+  // Original file order from CLI arguments
+  fileOrder: string[];
   // Summary of task counts
   summary: {
     totalFiles: number;
@@ -36,11 +38,14 @@ export function collectTasks(fileContents: Map<string, string>): TaskCollection 
   const allTasks: FileTask[] = [];
   const tasksByFile = new Map<string, FileTask[]>();
 
+  // Use fileContents keys to preserve original order
+  const fileEntries = Array.from(fileContents.entries());
+
   let totalTasks = 0;
   let completedTasks = 0;
 
-  // Process each file
-  for (const [filePath, content] of fileContents.entries()) {
+  // Process each file in order
+  for (const [filePath, content] of fileEntries) {
     // Extract the file name from the path
     const fileName = filePath.split("/").pop() || filePath;
 
@@ -54,7 +59,7 @@ export function collectTasks(fileContents: Map<string, string>): TaskCollection 
       fileName,
     }));
 
-    // Add to collections
+    // Add to collections in original order
     allTasks.push(...fileTasks);
     tasksByFile.set(filePath, fileTasks);
 
@@ -70,6 +75,7 @@ export function collectTasks(fileContents: Map<string, string>): TaskCollection 
   return {
     allTasks,
     tasksByFile,
+    fileOrder: fileEntries.map(([filePath]) => filePath),
     summary: {
       totalFiles: fileContents.size,
       totalTasks,
