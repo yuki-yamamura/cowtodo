@@ -3,17 +3,17 @@ import { TodoTaskWithContext, processTasks } from './markdown.js';
 /**
  * Task information with file source
  */
-export interface FileTask extends TodoTaskWithContext {
+export type FileTask = TodoTaskWithContext & {
   // Source file path
   filePath: string;
   // File name (without path)
   fileName: string;
-}
+};
 
 /**
  * Task collection organized by file
  */
-export interface TaskCollection {
+export type TaskCollection = {
   // All tasks, flattened
   allTasks: FileTask[];
   // Tasks grouped by file
@@ -27,7 +27,7 @@ export interface TaskCollection {
     completedTasks: number;
     completionPercentage: number;
   };
-}
+};
 
 /**
  * Process multiple files and collect their tasks

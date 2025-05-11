@@ -62,10 +62,10 @@ function getDescendantsInOrder(task: FileTask): FileTask[] {
   return result;
 }
 
-interface TaskViewProps {
+type TaskViewProps = {
   tasks: TaskCollection;
   showDetails?: boolean;
-}
+};
 
 /**
  * Component to display a single task

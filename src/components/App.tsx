@@ -62,9 +62,9 @@ function getChildTasksOrdered(parent: FileTask): FileTask[] {
   return result;
 }
 
-interface AppProps {
+type AppProps = {
   options: CliOptions;
-}
+};
 
 export const App = ({ options }: AppProps): ReactNode => {
   const { input, flags } = options;

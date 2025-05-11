@@ -3,10 +3,10 @@ import { Box, Text } from 'ink';
 import cowsay from 'cowsay';
 import { readFileContent } from '../utils/file.js';
 
-interface FileViewerProps {
+type FileViewerProps = {
   filePath: string;
   verbose?: boolean;
-}
+};
 
 export const FileViewer = ({ filePath, verbose = false }: FileViewerProps): ReactNode => {
   const [content, setContent] = useState<string | null>(null);

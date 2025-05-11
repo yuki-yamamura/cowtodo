@@ -1,7 +1,7 @@
 /**
- * Command line options interface
+ * Command line options type
  */
-export interface CliOptions {
+export type CliOptions = {
   input: string[];
   flags: {
     verbose: boolean;
@@ -11,4 +11,4 @@ export interface CliOptions {
     detailed?: boolean;
     [key: string]: unknown;
   };
-}
+};

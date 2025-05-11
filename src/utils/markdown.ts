@@ -1,7 +1,7 @@
 /**
  * Represents a task item in markdown
  */
-export interface TodoTask {
+export type TodoTask = {
   // The full text of the task
   text: string;
   // The raw content of the task (excluding checkbox)
@@ -20,7 +20,7 @@ export interface TodoTask {
   allChildrenComplete: boolean;
   // Effective completion status (considering children)
   effectivelyComplete: boolean;
-}
+};
 
 /**
  * Extracts task items from markdown text
@@ -163,10 +163,10 @@ export function extractHeadingContext(markdownText: string): Map<number, string>
  * @param headingContext Map of line numbers to heading context
  * @returns Array of tasks with context
  */
-export interface TodoTaskWithContext extends TodoTask {
+export type TodoTaskWithContext = TodoTask & {
   // Heading context for the task
   context: string;
-}
+};
 
 export function addContextToTasks(tasks: TodoTask[], headingContext: Map<number, string>): TodoTaskWithContext[] {
   // Add context to each task
