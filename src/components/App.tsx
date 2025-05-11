@@ -182,18 +182,48 @@ export const App = ({ options }: AppProps): ReactNode => {
     );
   }
 
-  // Default mode: Display file contents through cowsay
-  // Combine all file contents
+  // Default mode: Extract tasks and display through cowsay
+  // Collect tasks from all files
+  const taskCollection = collectTasks(fileContents);
+
+  // Format task content for cowsay
   let combinedText = "";
 
-  for (const [filePath, content] of fileContents.entries()) {
-    if (combinedText) combinedText += "\n\n";
+  // Add Backlog section with pending tasks
+  const pendingTasks = taskCollection.allTasks.filter((task) => !task.completed);
+  if (pendingTasks.length > 0 || errors.size > 0) {
+    combinedText += "## Backlog\n\n";
 
-    if (flags.verbose) {
-      combinedText += `File: ${filePath}\n`;
-    }
+    // Add pending tasks
+    pendingTasks.forEach((task) => {
+      const indent = " ".repeat(task.indent * 2);
+      combinedText += `${indent}- [ ] ${task.content}\n`;
+    });
+  }
 
-    combinedText += content;
+  // Add an empty line between sections
+  if (
+    pendingTasks.length > 0 &&
+    taskCollection.allTasks.filter((task) => task.completed).length > 0
+  ) {
+    combinedText += "\n";
+  }
+
+  // Add Done section with completed tasks
+  const completedTasks = taskCollection.allTasks.filter((task) => task.completed);
+  if (completedTasks.length > 0) {
+    combinedText += "## Done\n\n";
+
+    // Add completed tasks
+    completedTasks.forEach((task) => {
+      const indent = " ".repeat(task.indent * 2);
+      combinedText += `${indent}- [x] ${task.content}\n`;
+    });
+  }
+
+  // If no tasks found, show a message
+  if (taskCollection.allTasks.length === 0) {
+    combinedText = "No tasks found in the provided files.";
   }
 
   // Add any errors
