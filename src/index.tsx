@@ -1,22 +1,45 @@
-import { render, Text, Box } from "ink";
-import cowsay from "cowsay";
+import { render } from "ink";
+import meow from "meow";
+import { App } from "./components/App.js";
 
-// Simple component that wraps cowsay
-function App() {
-  // Get the cowsay output
-  const message = "Hello from Cowtodo!";
-  const options = {
-    text: message,
-  };
+// Parse command line arguments
+const cli = meow(
+  `
+  Usage
+    $ cowtodo <file> [options]
 
-  const cowOutput = cowsay.say(options);
+  Arguments
+    <file>  Path to a markdown file to read
 
-  return (
-    <Box flexDirection="column">
-      <Text>{cowOutput}</Text>
-    </Box>
-  );
-}
+  Options
+    --verbose  Show verbose output
+    --version  Show version
+    --help     Show this help message
+
+  Examples
+    $ cowtodo README.md
+    $ cowtodo docs/todo.md --verbose
+`,
+  {
+    importMeta: import.meta,
+    flags: {
+      verbose: {
+        type: "boolean",
+        default: false,
+      },
+      version: {
+        type: "boolean",
+        default: false,
+        shortFlag: "v",
+      },
+      help: {
+        type: "boolean",
+        default: false,
+        shortFlag: "h",
+      },
+    },
+  }
+);
 
 // Render the app
-render(<App />);
+render(<App options={cli} />);
